@@ -1,44 +1,55 @@
 ## Matrix inversion can be a costly computation so it might be useful 
-## to cache the inverse of a matrix. The following two functions are 
-## used to cache the inverse of a matrix.
+## to cache the result of the computation. 
+## The following two functions combined can be used to cache/return 
+## the inverse of a matrix.
 
-## makeCacheMatrix creates a list that contains:
-## 4 member functions: set, get, setInv, getInv
+## makeCacheMatrix creates a list that contains 4 member functions: 
+##  set         create matrix
+##  get         get matrix
+##  setInverse  invert matrix and cache
+##  getInverse  get matrix from cache
+
+## cacheSolve uses these functions to get/set the inverted matrix in cache
 
 makeCacheMatrix <- function(x = matrix()) {
-  xinv <- NULL 
+  xinverse <- NULL 
+  
   set <- function(y) {
     x <<- y
-    xinv <<- NULL 
+    xinverse <<- NULL 
   }
-  
   get <- function() x 
-  setInv <- function(inv) xinv <<- inv 
-  getInv <- function() xinv 
-  list(set = set, get = get, setInv = setInv, getInv = getInv)
+  setInverse <- function(inverse) xinverse <<- inverse
+  getInverse <- function() xinverse 
+  
+  list(set = set, get = get, setInverse = setInverse, getInverse = getInverse)
 }
 
-## cacheSolve returns inverse of matrix. If possible from cache. 
+## cacheSolve returns inverse of matrix. if possible from cache. 
 cacheSolve <- function(x, ...) {
-  m <- x$getInv() 
+  m <- x$getInverse() 
+  
   if(!is.null(m)) { 
-    message("inverse from cache!")
+    message("return inverse from cache!")
     return(m) 
   }
-  else  {message("compute inverse!")}
+  else  {
+    message("return calculated inverse!")
+    data <- x$get() 
+    m <- solve(data) 
+    x$setInverse(m) 
+    m 
+  }
 
-  data <- x$get() 
-  m <- solve(data) 
-  x$setInv(m) 
-  m 
+
 }
-
 
 ## Test scripts:
 
-## test <- matrix(runif(4,1,10),2,2)
-## testCached <- makeCacheMatrix(test)
-## cacheSolve(testCached)
-## cacheSolve(testCached)
+## source("cachematrix.R")                    load program
+## testCached <- makeCacheMatrix(test)        create functions
+## testCached$set(matrix(runif(4,1,10),2,2))  create matrix 
 
+## cacheSolve(testCached)                     returns calculated inverted matrix
+## cacheSolve(testCached)                     return inverted matrix from cache
 
